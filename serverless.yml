@@ -3,17 +3,17 @@ service: cloud-backend
 
 provider:
     name: aws
-    runtime: nodejs18.x
+    runtime: nodejs22.x
     region: eu-north-1
     iam:
-        role: Iamadmin
-        # er det rett? ^
+        role: arn:aws:iam::405474549497:role/BasicLambdaRole
+        # role that could potentially, maybe, have one or ten policies more than needed
 
 # etter hvert som jeg lager functions -- så lager jeg api-pathen til dem her
 functions:
-    hello:
-        handler: handler.hello
+    handleRegister:
+        handler: functions/handleRegister.handler
         events:
             - http:
-                  path: hello
-                  method: get
+                  path: register
+                  method: POST
