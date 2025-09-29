@@ -14,19 +14,15 @@ async function handleRegister(event) {
 	const { username, password } = JSON.parse(event.body);
 	// fetches whatever the frontend body has in it
 
+	const pk = `USER#${username.toLowerCase()}`;
+	const sk = 'PROFILE';
+
 	if (!username || !password) {
 		// if one of them is missing...
 		const error = new Error('Missing username or password');
 		error.statusCode = 400;
 		throw error;
 	}
-
-	// hashing passsword and storiing it in a variable -- mixing it 10 times
-	const hashedPassword = await bcrypt.hash(password, 10);
-
-	const userId = uuidv4();
-	const pk = `USER#${userId}`;
-	const sk = 'PROFILE';
 
 	// checking if the user already exists
 	const existing = await dynamo
@@ -45,17 +41,30 @@ async function handleRegister(event) {
 		throw error;
 	}
 
+	// hashing passsword and storiing it in a variable -- mixing it 10 times
+	const hashedPassword = await bcrypt.hash(password, 10);
+
+	const fullId = uuidv4(); // don't want a very long uuid id, so I'm splicing it to 4
+	const userId = fullId.slice(0, 4);
+
+	const now = new Date();
+	const createdAt = `${now.getFullYear()}-${String(
+		now.getMonth() + 1
+	).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(
+		now.getHours()
+	).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
 	// saving the new user to the database inside my table, as a new USER item
 	await dynamo
 		.putItem({
 			TableName: TABLE_NAME,
 			Item: {
-				pk: { S: `USER#${userId}` },
-				sk: { S: 'PROFILE' },
+				pk: { S: pk },
+				sk: { S: sk },
 				userId: { S: userId },
 				username: { S: username },
 				passwordHash: { S: hashedPassword },
-				createdAt: { S: new Date().toISOString() },
+				createdAt: { S: createdAt },
 			},
 		})
 		.promise();
