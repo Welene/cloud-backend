@@ -5,6 +5,19 @@ provider:
     name: aws
     runtime: nodejs22.x
     region: eu-north-1
+    httpApi:
+        cors:
+            allowedOrigins:
+                - '*'
+            allowedHeaders:
+                - Content-Type
+                - Authorization # for auth tokens later on...
+            allowedMethods:
+                - GET
+                - POST
+                - PUT
+                - PATCH
+                - DELETE
     iam:
         role: arn:aws:iam::405474549497:role/BasicLambdaRole
         # role that could potentially, maybe, have one or ten policies more than needed
@@ -14,6 +27,6 @@ functions:
     handleRegister:
         handler: functions/handleRegister.handler
         events:
-            - http:
-                  path: register
+            - httpApi:
+                  path: /register
                   method: POST
