@@ -11,7 +11,7 @@ provider:
                 - '*'
             allowedHeaders:
                 - Content-Type
-                - Authorization # for auth tokens later on...
+                - Authorization # auth token must be in header in the call
             allowedMethods:
                 - GET
                 - POST
@@ -21,6 +21,8 @@ provider:
     iam:
         role: arn:aws:iam::405474549497:role/BasicLambdaRole
         # role that could potentially, maybe, have one or ten policies more than needed
+    environment:
+        JWT_TOKEN: supersecretkey
 
 # etter hvert som jeg lager functions -- så lager jeg api-pathen til dem her
 functions:
@@ -36,3 +38,9 @@ functions:
             - httpApi:
                   path: /login
                   method: POST
+    getUserPosts:
+        handler: functions/getUserPosts.handler
+        events:
+            - httpApi:
+                  path: /posts/{userId}
+                  method: GET
