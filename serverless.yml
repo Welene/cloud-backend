@@ -18,6 +18,7 @@ provider:
                 - PUT
                 - PATCH
                 - DELETE
+                - OPTIONS
     iam:
         role: arn:aws:iam::405474549497:role/BasicLambdaRole
         # role that could potentially, maybe, have one or ten policies more than needed
@@ -44,3 +45,9 @@ functions:
             - httpApi:
                   path: /posts/{userId}
                   method: GET
+    createPost:
+        handler: functions/createPost.handler
+        events:
+            - httpApi:
+                  path: /posts
+                  method: POST
