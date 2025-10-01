@@ -3,7 +3,6 @@ import AWS from 'aws-sdk';
 import middy from '@middy/core';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
-import { errorHandler } from '../middlewares/errorHandler.mjs';
 
 const dynamo = new AWS.DynamoDB();
 const TABLE_NAME = 'cloud-db';
@@ -15,9 +14,10 @@ async function createNewPost(event) {
 	const authHeader =
 		event.headers.Authorization || event.headers.authorization;
 	if (!authHeader) {
-		const error = new Error('No token provided');
-		error.statusCode = 401;
-		throw error;
+		return {
+			statusCode: 401,
+			body: JSON.stringify({ message: 'No token provided' }),
+		};
 	}
 
 	const token = authHeader.split(' ')[1];
@@ -26,22 +26,24 @@ async function createNewPost(event) {
 	try {
 		payload = jwt.verify(token, JWT_TOKEN);
 	} catch (err) {
-		const error = new Error('Invalid token');
-		error.statusCode = 401;
-		throw error;
+		return {
+			statusCode: 401,
+			body: JSON.stringify({ message: 'Invalid token' }),
+		};
 	}
 
 	const { userId } = payload;
 	const { title, content } = JSON.parse(event.body);
 
 	if (!title || !content) {
-		const error = new Error('Title and content required');
-		error.statusCode = 400;
-		throw error;
+		return {
+			statusCode: 400,
+			body: JSON.stringify({ message: 'Title and content required' }),
+		};
 	}
 
 	const fullId = uuidv4();
-	const postId = `POST#${fullId.slice(0, 4)}`;
+	const postId = `POST#${fullId.slice(0, 4)}`; // short 4-character id for each post
 
 	await dynamo
 		.putItem({
@@ -58,8 +60,8 @@ async function createNewPost(event) {
 
 	return {
 		statusCode: 201,
-		body: { message: 'Post created', postId },
+		body: JSON.stringify({ message: 'Post created', postId }),
 	};
 }
 
-export const handler = middy(createNewPost).use(errorHandler());
+export const handler = middy(createNewPost);

@@ -1,15 +1,18 @@
 //POST login -- sending login info in body
 import AWS from 'aws-sdk';
+import bcrypt from 'bcryptjs';
 import middy from '@middy/core';
-import jwt from 'jsonwebtoken';
 import { errorHandler } from '../middlewares/errorHandler.mjs';
 import { sendResponse } from '../responses/sendResponse.mjs';
+import jwt from 'jsonwebtoken';
 
 const dynamo = new AWS.DynamoDB();
 const TABLE_NAME = 'cloud-db';
 const JWT_TOKEN = process.env.JWT_TOKEN;
 
-if (!JWT_TOKEN) throw new Error('JWT_TOKEN environment variable is missing');
+if (!JWT_TOKEN) {
+	throw new Error('JWT_TOKEN environment variable is missing');
+}
 
 async function handleLogin(event) {
 	const { username, password } = JSON.parse(event.body);
@@ -23,7 +26,7 @@ async function handleLogin(event) {
 	const pk = `USER#${username.toLowerCase()}`;
 	const sk = 'PROFILE';
 
-	const result = await dynamo
+	const result = await dynamo // venter på resultatet fra backenden, har med info fra login body
 		.getItem({
 			TableName: TABLE_NAME,
 			Key: { pk: { S: pk }, sk: { S: sk } },
