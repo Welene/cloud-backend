@@ -41,6 +41,21 @@ async function createNewPost(event) {
 		};
 	}
 
+	const profileResult = await dynamo //---------------------------------------------------------------------------------GETTING THE USERNAME FROM SK: PROFILE
+		.getItem({
+			TableName: 'cloud-db',
+			Key: {
+				pk: { S: `USER#${userId}` },
+				sk: { S: 'PROFILE' },
+			},
+			ProjectionExpression: 'username',
+		})
+		.promise();
+
+	const username = profileResult.Item?.username?.S || 'Unknown';
+
+	// ------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 	const fullId = uuidv4();
 	const postId = `POST#${fullId.slice(0, 4)}`; // short 4-character id for each post
 
@@ -57,6 +72,7 @@ async function createNewPost(event) {
 			Item: {
 				pk: { S: `USER#${userId}` },
 				sk: { S: postId },
+				username: { S: username }, //--------------------------------------------------------------------------------------ADDED USERNAME HERE
 				title: { S: title },
 				content: { S: content },
 				createdAt: { S: createdAt },
@@ -66,7 +82,7 @@ async function createNewPost(event) {
 
 	return {
 		statusCode: 201,
-		body: JSON.stringify({ message: 'Post created', postId }),
+		body: JSON.stringify({ message: 'Post created', postId, username }), //----------------------------------------------------------ADDED USERNAME HERE TOO
 	};
 }
 

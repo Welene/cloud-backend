@@ -31,12 +31,14 @@ async function getUserPosts(event) {
 	const posts = result.Items.map((item) => ({
 		postId: item.sk.S.replace('POST#', ''),
 		userId,
+		username: item.username?.S || '', // -----------------------------------------------------------------------------------------------------------ADDED USERNAME HERE
 		title: item.title?.S || '',
 		content: item.content?.S || '',
 		createdAt: item.createdAt?.S || '',
 	}));
 
-	return sendResponse(200, posts, `Posts for user ${userId}`);
+	// return sendResponse(200, posts, `Posts for user ${userId}`);
+	return sendResponse(200, { posts, message: `Posts for user ${userId}` }); //-----------WRAPPING BECAUSE RESPONSE IS [] NOT {}, now axios will get [] & CAN MAP THROUGH
 }
 
 export const handler = middy(getUserPosts).use(errorHandler());
