@@ -51,3 +51,36 @@ functions:
             - httpApi:
                   path: /posts
                   method: POST
+    getAllPosts:
+        handler: functions/getAllPosts.handler
+        events:
+            - httpApi:
+                  path: /posts
+                  method: GET
+# resources:
+#     Resources:
+#         CloudDbTable:
+#             Type: AWS::DynamoDB::Table
+#             Properties:
+#                 TableName: cloud-db
+#                 AttributeDefinitions:
+#                     - AttributeName: pk
+#                       AttributeType: S
+#                     - AttributeName: sk
+#                       AttributeType: S
+#                 KeySchema:
+#                     - AttributeName: pk
+#                       KeyType: HASH
+#                     - AttributeName: sk
+#                       KeyType: RANGE
+#                 BillingMode: PAY_PER_REQUEST
+
+#                 GlobalSecondaryIndexes:
+#                     - IndexName: GlobalPostsIndex
+#                       KeySchema:
+#                           - AttributeName: pk
+#                             KeyType: HASH
+#                           - AttributeName: sk
+#                             KeyType: RANGE
+#                       Projection:
+#                           ProjectionType: ALL

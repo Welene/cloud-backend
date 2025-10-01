@@ -1,5 +1,4 @@
 //GET (has to be logged in), see all posts by a user
-// GET -- fetch all posts by a specific userId
 import AWS from 'aws-sdk';
 import middy from '@middy/core';
 import { errorHandler } from '../middlewares/errorHandler.mjs';
@@ -10,22 +9,21 @@ const TABLE_NAME = 'cloud-db';
 
 async function getUserPosts(event) {
 	const { userId } = event.pathParameters;
-
 	if (!userId) {
-		const error = new Error('you need an userId');
+		const error = new Error('userId is required');
 		error.statusCode = 400;
 		throw error;
 	}
 
-	const result = await dynamo // query after ALL posts by ONE user
+	const result = await dynamo
 		.query({
 			TableName: TABLE_NAME,
 			KeyConditionExpression: 'pk = :pk AND begins_with(sk, :postPrefix)',
 			ExpressionAttributeValues: {
 				':pk': { S: `USER#${userId}` },
-				':postPrefix': { S: 'POST#' }, // gets all POST sk's and ignores the PROFILE sk in the table
+				':postPrefix': { S: 'POST#' },
 			},
-			ScanIndexForward: false, // shows the most recent post first
+			ScanIndexForward: false,
 		})
 		.promise();
 

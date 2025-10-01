@@ -7,31 +7,24 @@ import { errorHandler } from '../middlewares/errorHandler.mjs';
 import { sendResponse } from '../responses/sendResponse.mjs';
 
 const dynamo = new AWS.DynamoDB();
-const TABLE_NAME = 'cloud-db'; // a dynamo client --> with my dynamo table name
+const TABLE_NAME = 'cloud-db';
 
-// Function
 async function handleRegister(event) {
 	const { username, password } = JSON.parse(event.body);
-	// fetches whatever the frontend body has in it
-
-	const pk = `USER#${username.toLowerCase()}`;
-	const sk = 'PROFILE';
 
 	if (!username || !password) {
-		// if one of them is missing...
 		const error = new Error('Missing username or password');
 		error.statusCode = 400;
 		throw error;
 	}
 
-	// checking if the user already exists
+	const pk = `USER#${username.toLowerCase()}`;
+	const sk = 'PROFILE';
+
 	const existing = await dynamo
 		.getItem({
 			TableName: TABLE_NAME,
-			Key: {
-				pk: { S: pk },
-				sk: { S: sk },
-			},
+			Key: { pk: { S: pk }, sk: { S: sk } },
 		})
 		.promise();
 
@@ -41,12 +34,9 @@ async function handleRegister(event) {
 		throw error;
 	}
 
-	// hashing passsword and storiing it in a variable -- mixing it 10 times
 	const hashedPassword = await bcrypt.hash(password, 10);
 
-	const fullId = uuidv4(); // don't want a very long uuid id, so I'm splicing it to 4
-	const userId = fullId.slice(0, 4);
-
+	const userId = uuidv4().slice(0, 4);
 	const now = new Date();
 	const createdAt = `${now.getFullYear()}-${String(
 		now.getMonth() + 1
@@ -54,7 +44,6 @@ async function handleRegister(event) {
 		now.getHours()
 	).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-	// saving the new user to the database inside my table, as a new USER item
 	await dynamo
 		.putItem({
 			TableName: TABLE_NAME,
@@ -69,7 +58,6 @@ async function handleRegister(event) {
 		})
 		.promise();
 
-	// if it works
 	return sendResponse(
 		201,
 		{ userId, username },
