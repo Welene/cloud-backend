@@ -6,7 +6,6 @@ import { errorHandler } from '../middlewares/errorHandler.mjs';
 import { sendResponse } from '../responses/sendResponse.mjs';
 
 const dynamo = new AWS.DynamoDB();
-const TABLE_NAME = 'cloud-db';
 
 async function getUserPosts(event) {
 	const { userId } = event.pathParameters;
@@ -19,7 +18,7 @@ async function getUserPosts(event) {
 
 	const result = await dynamo // query after ALL posts by ONE user
 		.query({
-			TableName: TABLE_NAME,
+			TableName: 'cloud-db',
 			KeyConditionExpression: 'pk = :pk AND begins_with(sk, :postPrefix)',
 			ExpressionAttributeValues: {
 				':pk': { S: `USER#${userId}` },

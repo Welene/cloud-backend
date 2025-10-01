@@ -5,7 +5,6 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
 const dynamo = new AWS.DynamoDB();
-const TABLE_NAME = 'cloud-db';
 const JWT_TOKEN = process.env.JWT_TOKEN;
 
 if (!JWT_TOKEN) throw new Error('JWT_TOKEN missing');
@@ -45,15 +44,22 @@ async function createNewPost(event) {
 	const fullId = uuidv4();
 	const postId = `POST#${fullId.slice(0, 4)}`; // short 4-character id for each post
 
+	const now = new Date();
+	const createdAt = `${now.getFullYear()}-${String(
+		now.getMonth() + 1
+	).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(
+		now.getHours()
+	).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
 	await dynamo
 		.putItem({
-			TableName: TABLE_NAME,
+			TableName: 'cloud-db',
 			Item: {
 				pk: { S: `USER#${userId}` },
 				sk: { S: postId },
 				title: { S: title },
 				content: { S: content },
-				createdAt: { S: new Date().toISOString() },
+				createdAt: { S: createdAt },
 			},
 		})
 		.promise();

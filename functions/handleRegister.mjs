@@ -7,7 +7,6 @@ import { errorHandler } from '../middlewares/errorHandler.mjs';
 import { sendResponse } from '../responses/sendResponse.mjs';
 
 const dynamo = new AWS.DynamoDB();
-const TABLE_NAME = 'cloud-db'; // a dynamo client --> with my dynamo table name
 
 // Function
 async function handleRegister(event) {
@@ -27,7 +26,7 @@ async function handleRegister(event) {
 	// checking if the user already exists
 	const existing = await dynamo
 		.getItem({
-			TableName: TABLE_NAME,
+			TableName: 'cloud-db',
 			Key: {
 				pk: { S: pk },
 				sk: { S: sk },
@@ -57,7 +56,7 @@ async function handleRegister(event) {
 	// saving the new user to the database inside my table, as a new USER item
 	await dynamo
 		.putItem({
-			TableName: TABLE_NAME,
+			TableName: 'cloud-db',
 			Item: {
 				pk: { S: pk },
 				sk: { S: sk },

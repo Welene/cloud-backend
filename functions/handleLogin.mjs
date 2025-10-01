@@ -7,7 +7,6 @@ import { sendResponse } from '../responses/sendResponse.mjs';
 import jwt from 'jsonwebtoken';
 
 const dynamo = new AWS.DynamoDB();
-const TABLE_NAME = 'cloud-db';
 const JWT_TOKEN = process.env.JWT_TOKEN;
 
 if (!JWT_TOKEN) {
@@ -28,7 +27,7 @@ async function handleLogin(event) {
 
 	const result = await dynamo // venter på resultatet fra backenden, har med info fra login body
 		.getItem({
-			TableName: TABLE_NAME,
+			TableName: 'cloud-db',
 			Key: { pk: { S: pk }, sk: { S: sk } },
 		})
 		.promise();
