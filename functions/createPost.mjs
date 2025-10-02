@@ -76,6 +76,8 @@ async function createNewPost(event) {
 				title: { S: title },
 				content: { S: content },
 				createdAt: { S: createdAt },
+				GSI1PK: { S: 'POST' }, // ................................................................................ NEW GSI STUFF ADDED THURSDAY
+				GSI1SK: { S: new Date().toISOString() }, // ............................................................... NEW GSI STUFF ADDED THURSDAY
 			},
 		})
 		.promise();
