@@ -44,7 +44,7 @@ async function handleLogin(event) {
 			username: result.Item.username.S,
 		},
 		JWT_TOKEN,
-		{ expiresIn: '1h' }
+		{ expiresIn: '2h' }
 	);
 
 	return sendResponse(
