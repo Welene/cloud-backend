@@ -38,6 +38,16 @@ async function handleLogin(event) {
 		throw error;
 	}
 
+	const validPassword = await bcrypt.compare(
+		password,
+		result.Item.passwordHash.S
+	);
+	if (!validPassword) {
+		const error = new Error('Wrong username/password'); // psst... don't tell the user exactly which one, hackers will benefit from that
+		error.statusCode = 401;
+		throw error;
+	}
+
 	const token = jwt.sign(
 		{
 			userId: result.Item.userId.S,
