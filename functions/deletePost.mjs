@@ -28,17 +28,12 @@ async function deletePost(event) {
 	const pk = `USER#${userId}`;
 	const sk = `POST#${skPostId}`;
 
-	console.log('DEBUG deletePost pk:', pk);
-	console.log('DEBUG deletePost sk:', sk);
-
 	const getResult = await dynamo
 		.getItem({
 			TableName: 'cloud-db',
 			Key: { pk: { S: pk }, sk: { S: sk } },
 		})
 		.promise();
-
-	console.log('DEBUG getResult:', JSON.stringify(getResult, null, 2));
 
 	if (!getResult.Item) throw { statusCode: 404, message: 'Post not found' };
 
@@ -48,8 +43,6 @@ async function deletePost(event) {
 			Key: { pk: { S: pk }, sk: { S: sk } },
 		})
 		.promise();
-
-	console.log(`DEBUG post deleted: ${pk} / ${sk}`);
 
 	return sendResponse(200, {}, 'Post deleted successfully');
 }

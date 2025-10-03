@@ -63,6 +63,12 @@ functions:
             - httpApi:
                   path: /posts/delete/{postId}
                   method: DELETE
+    editPost:
+        handler: functions/editPost.handler
+        events:
+            - httpApi:
+                  path: /posts/{postId}
+                  method: PUT
 # resources:
 #     Resources:
 #         CloudDbTable:
