@@ -23,6 +23,12 @@ async function handleRegister(event) {
 		throw error;
 	}
 
+	if (password.length < 6 || password.length > 30) {
+		const error = new Error('Password length: between 6 and 30 characters');
+		error.statusCode = 400;
+		throw error;
+	}
+
 	// checking if the user already exists
 	const existing = await dynamo
 		.getItem({
